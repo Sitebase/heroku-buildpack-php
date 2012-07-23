@@ -32,9 +32,12 @@ Pre-compiling binaries
     
     #make the directories
     mkdir /app
-    mkdir /app/{apache,php,local}
+    mkdir /app/apache
+    mkdir /app/php
+    mkdir /app/local
     mkdir /app/php/ext
-    mkdir /app/local/{lib,bin}
+    mkdir /app/local/lib
+    mkdir /app/local/bin
     
     #copy libs
     cp -a /usr/lib/libmcrypt* /app/local/lib/
