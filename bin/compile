@@ -48,7 +48,8 @@ curl --silent --max-time 60 --location "$PHP_URL" | tar xz
 echo "-----> Installing Composer"
 COMPOSER_URL="http://bubobox.deploy.s3.amazonaws.com/heroku/composer.phar"
 echo "-----> Download composer to $BUILD_DIR/bin/composer"
-curl $COMPOSER_URL -s -o $BUILD_DIR/bin/composer
+curl --silent --location "$COMPOSER_URL" -o $BUILD_DIR/bin/composer
+echo "-----> Construct composer path"
 COMPOSER=$BUILD_DIR/bin/composer
 echo "-----> Set write permissions for composer: $COMPOSER"
 chmod +x $COMPOSER
