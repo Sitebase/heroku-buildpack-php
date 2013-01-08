@@ -84,8 +84,7 @@ ln -s /app/php/bin/php bin/php
 
 	# do the deed!
 	echo "Running: php composer.phar install" | indent
-	cd ${BUILD_DIR}/www
-	LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/php/bin/php ${BUILD_DIR}/composer.phar install -n | indent
+	LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/php/bin/php composer.phar update -d www -n | indent
 
 	export GIT_DIR=$GIT_DIR_ORIG
 
