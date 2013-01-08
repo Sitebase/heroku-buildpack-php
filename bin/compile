@@ -18,6 +18,14 @@ BUILD_DIR=$1
 CACHE_DIR=$2
 LP_DIR=`cd $(dirname $0); cd ..; pwd`
 
+COMPOSER_URL="http://bubobox.deploy.s3.amazonaws.com/heroku/composer.phar"
+export COMPOSER_HOME="${CACHE_DIR}/.composer"
+
+function download_url() {
+TARGET_URL="$1"
+curl -s -S -O -L -m 300 --connect-timeout 60 "$TARGET_URL"
+}
+
 echo "-----> Run Sitebase buildpack"
 
 # include .files when moving things around
@@ -26,7 +34,7 @@ shopt -s dotglob
 cd $BUILD_DIR
 
 # move app things to www
-mkdir -p $CACHE_DIR/www
+mkdir -p $BUILD_DIR $CACHE_DIR $CACHE_DIR/www ${BUILD_DIR}/local ${BUILD_DIR}/vendor/bin ${COMPOSER_HOME}
 mv * $CACHE_DIR/www
 mv $CACHE_DIR/www .
 
@@ -54,31 +62,27 @@ ln -s /app/php/bin/php bin/php
 
 ## COMPOSER ##
 
-echo "-----> Installing Composer"
-COMPOSER_URL="http://bubobox.deploy.s3.amazonaws.com/heroku/composer.phar"
-echo "-----> Download composer to $BUILD_DIR/bin/composer"
-curl --silent --location "$COMPOSER_URL" -o $BUILD_DIR/bin/composer
-echo "-----> Construct composer path"
-COMPOSER=$BUILD_DIR/bin/composer
-echo "-----> Set write permissions for composer: $COMPOSER"
-chmod +x $COMPOSER
+# Composer Installation
+pushd $BUILD_DIR > /dev/null
+if [ -f "composer.json" ]
+then
+	echo "-----> Installing dependencies using Composer"
+	GIT_DIR_ORIG=$GIT_DIR
+	unset GIT_DIR
 
-echo "-----> Installing Dependencies"
-echo "       Using `$COMPOSER --version`"
-cd $BUILD_DIR
-GIT_DIR_ORIG=$GIT_DIR
-unset GIT_DIR
-echo "       Running composer from `pwd`"
-$COMPOSER install
-cd $LP_DIR
-GIT_DIR=$GIT_DIR_ORIG
-unset GIT_DIR_ORIG
+	if [ ! -f "composer.phar" ]
+	then
+		echo "Fetching composer.phar" | indent
+		download_url "$COMPOSER_URL"
+	fi
 
-ln -s $COMPOSER_VENDOR_DIR $BUILD_DIR/
+	# do the deed!
+	echo "Running: php composer.phar install" | indent
+	LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php composer.phar install -n | indent
 
-mkdir -p $BUILD_DIR/.profile.d
-echo "------> Export composer.sh"
-echo "export PATH=\"\$HOME/bin:\$HOME/vendor/bin:\$PATH\"" > $BUILD_DIR/.profile.d/composer.sh
+	export GIT_DIR=$GIT_DIR_ORIG
+fi
+popd > /dev/null
 
 ## END COMPOSER ##
 
