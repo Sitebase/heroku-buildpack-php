@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # bin/compile <build-dir> <cache-dir>
-# heroku create --buildpack https://github.com/Sitebase/heroku-buildpack-php.git#develop
+# heroku create myapp --buildpack https://github.com/Sitebase/heroku-buildpack-php.git#develop
 
 #http://bubobox.deploy.s3.amazonaws.com/heroku/composer.phar
 
@@ -47,8 +47,10 @@ curl --silent --max-time 60 --location "$PHP_URL" | tar xz
 # composer
 echo "-----> Installing Composer"
 COMPOSER_URL="http://bubobox.deploy.s3.amazonaws.com/heroku/composer.phar"
+echo "-----> Download composer to $BUILD_DIR/bin/composer"
 curl $COMPOSER_URL -s -o $BUILD_DIR/bin/composer
 COMPOSER=$BUILD_DIR/bin/composer
+echo "-----> Set write permissions for composer: $COMPOSER"
 chmod +x $COMPOSER
 
 echo "-----> Installing Dependencies"
