@@ -26,6 +26,14 @@ TARGET_URL="$1"
 curl -s -S -O -L -m 300 --connect-timeout 60 "$TARGET_URL"
 }
 
+function indent() {
+  c='s/^/       /'
+  case $(uname) in
+    Darwin) sed -l "$c";;
+    *)      sed -u "$c";;
+  esac
+}
+
 echo "-----> Run Sitebase buildpack"
 
 # include .files when moving things around
