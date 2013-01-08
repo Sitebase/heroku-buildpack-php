@@ -44,7 +44,16 @@ PHP_URL="http://bubobox.deploy.s3.amazonaws.com/heroku/php-$PHP_VERSION.tar.gz"
 echo "-----> Bundling PHP version $PHP_VERSION"
 curl --silent --max-time 60 --location "$PHP_URL" | tar xz
 
-# composer
+# update config filesgs
+cp $LP_DIR/conf/httpd.conf $APACHE_PATH/conf
+cp $LP_DIR/conf/php.ini php
+
+# make php available on bin
+mkdir -p bin
+ln -s /app/php/bin/php bin/php
+
+## COMPOSER ##
+
 echo "-----> Installing Composer"
 COMPOSER_URL="http://bubobox.deploy.s3.amazonaws.com/heroku/composer.phar"
 echo "-----> Download composer to $BUILD_DIR/bin/composer"
@@ -68,15 +77,11 @@ unset GIT_DIR_ORIG
 ln -s $COMPOSER_VENDOR_DIR $BUILD_DIR/
 
 mkdir -p $BUILD_DIR/.profile.d
+echo "------> Export composer.sh"
 echo "export PATH=\"\$HOME/bin:\$HOME/vendor/bin:\$PATH\"" > $BUILD_DIR/.profile.d/composer.sh
 
-# update config filesgs
-cp $LP_DIR/conf/httpd.conf $APACHE_PATH/conf
-cp $LP_DIR/conf/php.ini php
+## END COMPOSER ##
 
-# make php available on bin
-mkdir -p bin
-ln -s /app/php/bin/php bin/php
 
 # set a slug_id identifier
 slug_id=$(php/bin/php -r "echo md5(uniqid('', TRUE));")
