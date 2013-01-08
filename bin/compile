@@ -63,9 +63,7 @@ ln -s /app/php/bin/php bin/php
 ## COMPOSER ##
 
 # Composer Installation
-pushd $BUILD_DIR > /dev/null
-if [ -f "composer.json" ]
-then
+
 	echo "-----> Installing dependencies using Composer"
 	GIT_DIR_ORIG=$GIT_DIR
 	unset GIT_DIR
@@ -81,8 +79,7 @@ then
 	LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php composer.phar install -n | indent
 
 	export GIT_DIR=$GIT_DIR_ORIG
-fi
-popd > /dev/null
+
 
 ## END COMPOSER ##
 
