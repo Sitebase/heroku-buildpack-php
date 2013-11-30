@@ -57,6 +57,7 @@ ln -s /app/php/bin/php bin/php
 
 # enable New Relic agent
 ln -s /app/newrelic/daemon bin/newrelic-daemon
+mkdir -p /app/php/lib/php/extensions/no-debug-non-zts-20090626
 ln -s /app/newrelic/newrelic-20090626.so /app/php/lib/php/extensions/no-debug-non-zts-20090626/newrelic.so
 
 cat >> php/php.ini << EOF
