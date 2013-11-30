@@ -66,6 +66,7 @@ extension=newrelic.so
 newrelic.daemon.location = "/app/bin/newrelic-daemon"
 newrelic.logfile = "/app/apache/logs/error_log"
 newrelic.daemon.logfile = "/app/apache/logs/error_log"
+newrelic.daemon.port = "/app/.newrelic.sock"
 EOF
 
 # set a slug_id identifier
