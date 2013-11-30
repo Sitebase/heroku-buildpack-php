@@ -64,6 +64,8 @@ cat >> php/php.ini << EOF
 extension=newrelic.so
 [newrelic]
 newrelic.daemon.location = "/app/bin/newrelic-daemon"
+newrelic.logfile = "/app/apache/logs/error_log"
+newrelic.daemon.logfile = "/app/apache/logs/error_log"
 EOF
 
 # set a slug_id identifier
