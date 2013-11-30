@@ -9,6 +9,8 @@ APACHE_VERSION="2.2.22"
 APACHE_PATH="apache"
 PHP_VERSION="5.3.10"
 PHP_PATH="php"
+NEWRELIC_VERSION="4.2.5.27"
+NEWRELIC_PATH="newrelic"
 
 BIN_DIR=$(dirname $0)
 BUILD_DIR=$1
@@ -41,6 +43,10 @@ PHP_URL="http://bubobox.deploy.s3.amazonaws.com/heroku/php-$PHP_VERSION.tar.gz"
 echo "-----> Bundling PHP version $PHP_VERSION"
 curl --silent --max-time 60 --location "$PHP_URL" | tar xz
 
+NEWRELIC_URL="http://bubobox.deploy.s3.amazonaws.com/heroku/newrelic-${NEWRELIC_VERSION}-mod_php5.tar.gz"
+echo "-----> Bundling New Relic agent version $NEWRELIC_VERSION"
+curl --silent --max-time 60 --location "$NEWRELIC_URL" | tar xz
+
 # update config files
 cp $LP_DIR/conf/httpd.conf $APACHE_PATH/conf
 cp $LP_DIR/conf/php.ini php
@@ -48,6 +54,16 @@ cp $LP_DIR/conf/php.ini php
 # make php available on bin
 mkdir -p bin
 ln -s /app/php/bin/php bin/php
+
+# enable New Relic agent
+ln -s /app/newrelic/daemon bin/newrelic-daemon
+ln -s /app/newrelic/newrelic-20090626.so /app/php/lib/php/extensions/no-debug-non-zts-20090626/newrelic.so
+
+cat >> php/php.ini << EOF
+extension=newrelic.so
+[newrelic]
+newrelic.daemon.location = "/app/bin/newrelic-daemon"
+EOF
 
 # set a slug_id identifier
 slug_id=$(php/bin/php -r "echo md5(uniqid('', TRUE));")
@@ -69,6 +85,8 @@ tail -F /app/apache/logs/error_log &
 tail -F /app/apache/logs/access_log &
 export LD_LIBRARY_PATH=/app/php/ext
 export PHP_INI_SCAN_DIR=/app/www
+
+echo "newrelic.license = \"\$NEWRELIC_LICENSE\"" >> "/app/php/php.ini"
 
 # let's check for hook scripts
 if [ -d www/.hooks ]; then
